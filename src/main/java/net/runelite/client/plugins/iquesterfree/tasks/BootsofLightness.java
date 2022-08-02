@@ -1,93 +1,158 @@
 package net.runelite.client.plugins.iquesterfree.tasks;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.TileItem;
+import net.runelite.api.TileObject;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.iquesterfree.Task;
 import net.runelite.client.plugins.iquesterfree.iQuesterFreePlugin;
-import net.runelite.client.plugins.iutils.api.TeleportLocation;
-import net.runelite.client.plugins.iutils.api.TeleportMethod;
 import net.runelite.client.plugins.iutils.game.ItemQuantity;
-import net.runelite.client.plugins.iutils.scene.Position;
-import net.runelite.client.plugins.iutils.scene.RectangularArea;
+import net.unethicalite.api.Interactable;
+//import net.unethicalite.api.items.Bank;
+import net.unethicalite.api.game.*;
+import net.unethicalite.api.items.*;
+import net.unethicalite.api.*;
+import net.unethicalite.api.movement.Movement;
+import net.unethicalite.api.entities.*;
+import net.unethicalite.api.items.GrandExchange;
+import net.unethicalite.api.utils.CoordUtils;
+import net.unethicalite.api.widgets.Dialog;
+import net.runelite.api.Client;
+import net.unethicalite.api.widgets.Widgets;
+
+import static net.runelite.api.ItemID.RING_OF_DUELING8;
+import static net.runelite.api.ItemID.CAMELOT_TELEPORT;
+import static net.runelite.api.ItemID.KNIFE;
+import static net.runelite.api.ItemID.CANDLE;
+import static net.runelite.api.ItemID.TINDERBOX;
+import static net.runelite.api.ItemID.VARROCK_TELEPORT;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.api.ItemID.STAMINA_POTION4;
-import static net.runelite.client.plugins.iquesterfree.iQuesterFreePlugin.questName;
-import static net.runelite.client.plugins.iquesterfree.iQuesterFreePlugin.taskConfig;
-
 @Slf4j
-public class RuneMystery extends Task {
-    private static final RectangularArea lumbCastle2nd = new RectangularArea(3208,3219,3212,3223,1);
-    private static final RectangularArea wizardBasement = new RectangularArea(3107, 9566, 3097, 9574, 0);
-    private static final RectangularArea AuburyHut = new RectangularArea(3251,3400,3254,3401);
+public class BootsofLightness extends Task {
+
+
 
     @Override
     public boolean validate() {
-        return iQuesterFreePlugin.taskConfig.RuneMystery() && questProgress() < 100;
+        return iQuesterFreePlugin.taskConfig.BootsofLightness();
     }
 
     @Override
     public String getTaskDescription() {
-        questName = "Rune Mystery";
-        return "Starting " + questName;
+        iQuesterFreePlugin.questName = "Get Boots of Lightness";
+        return "Starting " + iQuesterFreePlugin.questName;
     }
 
     @Override
     public List<ItemQuantity> requiredItems() {
-        List<ItemQuantity> items = new ArrayList<>();
-
-        if (questProgress() == 0) {
-            // items.add(new ItemQuantity(STAMINA_POTION4, 1));
-            items.addAll(new TeleportMethod(game, TeleportLocation.WIZARD_TOWER, 2).getItems());
-            items.addAll(new TeleportMethod(game, TeleportLocation.VARROCK_CENTRE, 3).getItems());
-            items.addAll(new TeleportMethod(game, TeleportLocation.LUMBRIDGE, 2).getItems());
-
-        }
-
-        return items;
+        return null;
     }
 
     @Override
     public void run() {
-        while (questProgress() < 7) {
-            log.info("Doing quest step: {} {}", questName, questProgress());
-            game.tick();
-            switch (questProgress()) {
-                case 0:
-                    iQuesterFreePlugin.status = "Obtaining items";
-                    //obtain(requiredItems());
-                    iQuesterFreePlugin.status = "Talking to Duke";
-                    chatNpc(lumbCastle2nd, "Duke Horacio", "Have you any quests for me?", "Yes.");
-                    break;
-                case 1:
-                    iQuesterFreePlugin.status = "Talking to Sedridor";
-                    chatNpc(wizardBasement, "Archmage Sedridor", "Okay, here you are.", "Go ahead.", "Yes, certainly");
-                    break;
-                case 3:
-                    iQuesterFreePlugin.status = "Talking to Aubury";
-                    chatNpc(AuburyHut, "Aubury", "I've been sent here with a package for you.");
-                    break;
-                    case 4:
-                    //add double chat to aubry
-                    break;
-                case 5:
-                    iQuesterFreePlugin.status = "Talking to Sedridor";
-                    chatNpc(wizardBasement, "Archmage Sedridor", "I'd better get going.");
+        log.info("Doing quest step: {} {}", iQuesterFreePlugin.questName, iQuesterFreePlugin.status2);
+        while (!Inventory.contains("Boots of lightness")) {
+            if (Inventory.contains(TINDERBOX) && Inventory.contains(CAMELOT_TELEPORT) && Inventory.contains(KNIFE) && Inventory.contains(CANDLE)){
+                iQuesterFreePlugin.status = "Lighting candle";
+            } else if (Inventory.contains(33)){
+                iQuesterFreePlugin.status = "Going to temple";
+            } else {iQuesterFreePlugin.status = "Buying items"; }
+            if (iQuesterFreePlugin.status == "Buying items") {
+                if (!Inventory.contains(VARROCK_TELEPORT)) {
+                    GrandExchange.buy(VARROCK_TELEPORT, 2, 2000, true, false);
+                    game.tick(2);
+                    return;
+                }
+                if (!Inventory.contains(CAMELOT_TELEPORT)) {
+                    GrandExchange.buy(CAMELOT_TELEPORT, 1, 2000, true, false);
+                    game.tick(2);
+                    return;
+                }
+                if (!Inventory.contains(KNIFE)) {
+                    GrandExchange.buy(KNIFE, 1, 2000, true, false);
+                    game.tick(2);
+                    return;
+                }
+                if (!Inventory.contains(CANDLE)) {
+                    GrandExchange.buy(CANDLE, 1, 2000, true, false);
+                    game.tick(2);
+                    return;
+                }
+                if (!Inventory.contains(TINDERBOX)) {
+                    GrandExchange.buy(TINDERBOX, 1, 2000, true, false);
+                    game.tick(2);
+                    Widgets.get(465, 2, 11).interact("Close");
+                    game.tick(2);
+                    Dialog.close();
+                    game.tick(2);
+                }
+            }
+            else if (iQuesterFreePlugin.status == "Lighting candle"){
+                if (!Inventory.contains(33)){
+                    Inventory.getFirst(TINDERBOX).useOn(Inventory.getFirst(CANDLE));
+                    game.tick(2);
+                    return;
+                }
+            }
+            else if (iQuesterFreePlugin.status == "Going to temple"){
+                WorldPoint ladderLoc = new WorldPoint(2677,3404,0);
+                WorldPoint StairLoc = new WorldPoint(2649,9804,0);
+                WorldPoint WebLoc = new WorldPoint(2653,9764,0);
 
-                    break;
-                    case 6:
-                    game.tick(4);
-                     handleCompletion();
-                    break;
+                if (Players.getLocal().getWorldLocation().equals(ladderLoc)) {
+                    iQuesterFreePlugin.status2 = "Trying to go down ladder";
+                    TileObjects.getNearest(o -> o.hasAction("Climb-down")).interact("Climb-down");
+                    game.tick(2);
+                    return;
+                } else {
+                    iQuesterFreePlugin.status2 = "Going to ladderLoc";
+                    Movement.walkTo(ladderLoc);
+                    game.tick(1);
+                }
+                if (Players.getLocal().getWorldLocation().equals(StairLoc)) {
+                    iQuesterFreePlugin.status2 ="Climb-down Stairs";
+                    TileObjects.getNearest(o -> o.hasAction("Climb-down")).interact("Climb-down");
+                    game.tick(2);
+                    return ;
+                } else
+                    iQuesterFreePlugin.status2 ="Walking to StairLoc";
+                Movement.walkTo(StairLoc);
+                game.tick(2);
+
+                if (Players.getLocal().getWorldLocation().equals(WebLoc)) {
+                    if (TileObjects.getNearest("Web") != null){
+                        iQuesterFreePlugin.status2 ="Slashing Web";
+                        TileObjects.getNearest("Web").interact("Slash");
+                        game.tick(3);
+                        return;
+                    }
+                    if (TileObjects.getNearest("Slashed web") != null){
+                        iQuesterFreePlugin.status2 ="Looting Boots";
+                        TileItems.getNearest("Boots of lightness").pickup();
+                        game.tick(2);
+                        return;
+                    }
+                    return;
+                } else if (!Players.getLocal().getWorldLocation().equals(WebLoc)) {
+                    iQuesterFreePlugin.status2 ="Walking to WebLoc";
+                    Movement.walkTo(WebLoc);
+                    game.tick(2);
+
+                }
             }
-            if (questProgress() == 6) {
-                game.tick(4);
-                handleCompletion();
-            }
+
         }
-    }
+
+            }
+
+   // }
     private int questProgress() {
-        return game.varp(63);
+        return game.varp(31);
     }
 }
